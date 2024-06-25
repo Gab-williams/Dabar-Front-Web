@@ -1137,7 +1137,7 @@ export default function Home1() {
           <div className="container">
             <div className="col-12">
               <div className="advertisement__image text-center">
-                <Link href="/#">
+                <Link href="https://tix.africa/discover/dabarevent">
                   <img
                     src="/assets/img/others/advertisement.png"
                     alt="advertisement"
@@ -1218,7 +1218,7 @@ export default function Home1() {
           <div className="container">
             <div className="col-12">
               <div className="advertisement__image text-center">
-                <Link href="/#">
+                <Link href="https://tix.africa/discover/dabarevent">
                   <img
                     src="/assets/img/others/advertisement.png"
                     alt="advertisement"
