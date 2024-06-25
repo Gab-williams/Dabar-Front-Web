@@ -162,31 +162,39 @@ export default function BlogSidebar2({selectedx}) {
                     <SidePostSlider />
                 </div>
                 <div className="widget sidebar-widget">
-                    <h4 className="widget-title text-center">Instagram Feeds</h4>
-                    <div className="sidebarInsta__wrap">
-                        <div className="sidebarInsta__top">
-                            <div className="sidebarInsta__logo">
-                                <img src="/assets/img/instagram/insta_logo.png" alt="img" />
-                            </div>
-                            <div className="sidebarInsta__info">
-                                <h6 className="name"><Link href="#">instagram/Dabar</Link></h6>
-                                <span className="designation">Your lens into ...</span>
-                            </div>
-                        </div>
-                        <div className="sidebarInsta__slider-wrap">
-                            <div className="swiper-container sidebarInsta-active">
-                                <InstagramSidebarSlider />
-                            </div>
-                            <div className="swiper-container sidebarInsta-active-2" dir="rtl">
-                                <InstagramSidebarSlider />
-                            </div>
-                        </div>
-                        <div className="sidebarInsta__bottom">
-                            <Link href="https://www.instagram.com/the.dabar/?igshid=YzAwZjE1ZTI0Zg%3D%3D" target="_blank" className="btn"><i className="fab fa-instagram" /><span className="text">Follow Me</span></Link>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-        </>
-    )
+          <h4 className="widget-title text-center">Dabar White Paper</h4>
+          <div className="sidebarInsta__wrap">
+          <InstagramSidebarSlider />
+          {/* <div className="swiper-container sidebarInsta-active">
+              
+              </div> */}
+            {/* <div className="sidebarInsta__top">
+              <div className="sidebarInsta__logo">
+                <img src="/assets/img/instagram/insta_logo.png" alt="img" />
+              </div>
+              <div className="sidebarInsta__info">
+                <h6 className="name">
+                  <Link href="#">instagram/Dabar</Link>
+                </h6>
+                <span className="designation">Your lens into ...</span>
+              </div>
+            </div> */}
+            <div className="sidebarInsta__slider-wrap">
+             
+            </div>
+            {/* <div className="sidebarInsta__bottom">
+              <Link
+                href="https://www.instagram.com/the.dabar/?igshid=YzAwZjE1ZTI0Zg%3D%3D"
+                target="_blank"
+                className="btn"
+              >
+                <i className="fab fa-instagram" />
+                <span className="text">Follow Me</span>
+              </Link>
+            </div> */}
+          </div>
+        </div>
+      </aside>
+    </>
+  );
 }

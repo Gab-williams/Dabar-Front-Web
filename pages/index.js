@@ -1,483 +1,1555 @@
-import { useEffect, useRef, useState } from "react";
-import { Inter } from "next/font/google";
-import Header from "../components/Header";
-import { useDispatch } from "react-redux";
-import { Addrefund_important } from "../state/reducers/refund.reducer";
-import localFont from "next/font/local";
-import { isEmpty } from "lodash";
-import { useGetCartInfoMutation } from "../state/services/profile.service";
-import { useSearchParams } from "next/navigation";
-import getSymbolFromCurrency from "currency-symbol-map";
-import Loader from "@/components/More/Loader";
-import { useRouter } from "next/navigation";
-import { setSuccessData } from "@/state/reducers/pos.reducer";
-import Head from "next/head";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import StepItem from "@/components/StepItem";
-import { DataTable } from "@/components/DataTable/Table";
-import { columns } from "@/components/DataTable/Columns";
-import Summary from "@/components/Summary";
-import { Button } from "@/components/ui/button";
-import Refund from "@/components/More/Refund";
-import Sidebar from "@/components/Sidebar";
-// import { cartData } from "@/lib/data";
-import Contact from "@/components/Contact";
-const aeonik = localFont({
-  src: [
-    {
-      path: "../../public/fonts/AeonikTRIAL-Bold.otf",
-      weight: "600",
-      style: "bold",
-    },
-    {
-      path: "../../public/fonts/AeonikTRIAL-Light.otf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/AeonikTRIAL-Regular.otf",
-      weight: "500",
-      style: "normal",
-    },
-  ],
-  variable: "--font-aeonik",
-});
+import Layout from "@/components/layout/Layout";
+import TrendingSlider from "@/components/slider/TrendingSlider";
+import data from "@/util/blogData";
+import Link from "next/link";
+import { useEffect, useState, useContext } from "react";
+import Marquee from "react-fast-marquee";
+import ModalVideo from "react-modal-video";
+import { createClient } from "contentful";
+import { CoinGeckoClient } from "coingecko-api-v3";
+import { context } from "@/components/context";
+import { NextSeo } from "next-seo";
+import axios from "axios";
+import ReactPaginate from "react-paginate";
+import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+// import { AES, enc } from 'crypto-js';
+import CryptoJS from "crypto-js";
+import Popup from "@/components/Popup";
+export default function Home1() {
+  const [isOpen, setOpen] = useState(false);
+  const [Herodata, setHerodata] = useState([]);
+  const [featured, setfeatured] = useState([]);
+  const [popular, setPopular] = useState([]);
+  const [cyptocoin, setcyptocoin] = useState([]);
+  const [lastpopular, setlastpopular] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [last_num_video, setLast_Num_Video] = useState(1);
+  const [is_close, Setis_close] = useState(false)
+  const client = createClient({
+    space: "t0pszie0jiqu",
+    accessToken: "bm2qgxL1ruXxTPkEQT0KgtAuHOwVxlOzOuj-AoNo-AM",
+  });
+  const created = useContext(context);
+  const { selectedx, setSelectedx } = created;
+  const coin = new CoinGeckoClient({
+    timeout: 10000,
+    autoRetry: true,
+  });
+  const arrxz = ["Editor"];
+  let son = JSON.stringify(arrxz);
+  // console.log(son)
+  //https://dabarmedia.com
+  // http://127.0.0.1:8000
+  const apiClient = axios.create({
+    baseURL: "https://dabarmedia.com/",
+    withCredentials: true,
+  });
 
-const stepContent = [
-  {
-    step: 0,
-    title: "Review cart",
-  },
-  {
-    step: 1,
-    title: "Review policy",
-  },
-  {
-    step: 2,
-    title: "Payment method",
-  },
-];
+  const [dataall, Setdataall] = useState([]);
 
-export default function Home() {
-  const [carts, setCarts] = useState({});
-  const [cartInfo, setCartInfo] = useState();
-  const [paymentTypes, setPaymentTypes] = useState({});
-  const [paymentCodes, setPaymentCodes] = useState([]);
-  const [api, setApi] = useState([]);
-  const [refundPolicy, setRefundPolicy] = useState("");
-  const [importantNotice, setImportantNotice] = useState("");
-  const [converted_cart, setConvertedCart] = useState([]);
-  const [expiredtime, setExpiredtime] = useState("");
-  const [getPaymentInfo, { data, error, isLoading }] = useGetCartInfoMutation();
-  const searchParams = useSearchParams();
-  const [type, setType] = useState(0);
-  const [isAccept, setIsAccept] = useState(false);
-  const [acceptNotice, setAcceptNotice] = useState(false);
-  const [checkingError, setCheckingError] = useState(true);
-  const [hasError, setHasError] = useState(false);
-  const [step, setStep] = useState(0);
-  const router = useRouter();
-  const inputRef = useRef(null);
 
   useEffect(() => {
-    // inputRef.current.focus();
+    const handlePageLoad = () => {
+      Setis_close(true)
+    };
+
+    // Check if the page is already loaded
+    if (document.readyState === 'complete') {
+      handlePageLoad();
+    } else {
+      // Add event listener for the 'load' event
+      window.addEventListener('load', handlePageLoad);
+
+      // Clean up the event listener when the component unmounts
+      return () => {
+        window.removeEventListener('load', handlePageLoad);
+      };
+    }
   }, []);
-  let dispatch = useDispatch();
 
   useEffect(() => {
-    if (!isEmpty(cartInfo)) {
-      const {
-        cart,
-        payment_gateway_code_available,
-        payment_gateways,
-        refund_policy,
-        payment_gateway_api,
-        important_notice,
-      } = cartInfo;
-      setExpiredtime(cart.remaining_time);
+    // updatestories
 
-      setCarts(cart);
-      setRefundPolicy(refund_policy);
-      setPaymentCodes(payment_gateway_code_available);
-      setPaymentTypes(payment_gateways);
-      setApi(payment_gateway_api);
-      setImportantNotice(important_notice);
-      let obj = { refund: refund_policy, important: important_notice };
-      dispatch(Addrefund_important(obj));
-      setTimeout(() => {}, cart.remaining_time);
-    } else {
-    }
-  }, [cartInfo, dispatch]);
-  useEffect(() => {
-    if (!isEmpty(carts?.items)) {
-      const { items } = carts;
-      const errors = items.filter((cartItem) => cartItem.hasError == true);
-      let today = new Date().toISOString();
-      let errorlog = { date: today, error: errors };
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
+    const changlang = async (selectedx, word) => {
+      if (selectedx != "" && word != "") {
+        const options = {
+          method: "POST",
+          url: "https://deepl-translator2.p.rapidapi.com/translate",
+          headers: {
+            "content-type": "application/json",
+            "X-RapidAPI-Key":
+              "7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0",
+            "X-RapidAPI-Host": "deepl-translator2.p.rapidapi.com",
+          },
+          data: {
+            source_lang: "EN",
+            target_lang: selectedx,
+            text: word,
+          },
+        };
 
-      const raw = JSON.stringify({
-        post: errorlog,
-      });
-
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-
-      fetch(
-        `${window.location.origin}/api/payment/callback/check`,
-        requestOptions
-      )
-        .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.error(error));
-
-      if (!isEmpty(errors)) {
-        setCheckingError(false);
-        setHasError(true);
-      } else {
-        setCheckingError(false);
-        setHasError(false);
+        let res = await axios.request(options);
+        return res.data;
       }
-    }
-  }, [carts, paymentCodes, paymentTypes]);
+    };
 
-  useEffect(() => {
-    if (!isEmpty(data) && data.statusCode === 200) {
-      const { data: paymentInfo } = data;
+    const HeroAPi = async () => {
+      // Hero Stories
+      // let top = await client.getEntries({content_type:"topstories",
+      // select:'fields'})
 
-      setCartInfo(paymentInfo);
-    } else {
-    }
-  }, [data]);
+      let urlz = "/api/randomcategory";
+      await apiClient.get("/sanctum/csrf-cookie");
+      let headers = new Headers();
+      headers.append("Content-Type", "application/json");
+      let topx = await apiClient.get(urlz, headers);
+      // console.log(topx.data.success)
 
-  useEffect(() => {
-    if (!isEmpty(error)) {
-      const { data, message } = error;
-      console.log(message);
-      if (data?.message === "Invalid Order") {
-        router.replace("401");
-        return;
+      const newData = await Promise.all(
+        topx.data.success.map(async (item) => {
+          // console.log(item.fields.storyId.fields.preSummary)
+          let timez = new Date(item.created_at);
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sept",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const day = timez.getDate();
+          const monthIndex = timez.getMonth();
+          const year = timez.getFullYear();
+          const formattedDate = `${day} ${monthNames[monthIndex]} ${year}`;
+          // let getid = await client.getEntry(item.sys.id)
+          // let data = await client.getEntry(item.fields.storyId.fields.categoryId.sys.id);
+          // let writer = await client.getEntry(item.fields.storyId.fields.writerId.sys.id);
+          // let answer = data.fields.category;
+
+          const originalString = JSON.stringify(item.id);
+          const encryptedString = CryptoJS.AES.encrypt(
+            originalString,
+            "TheDabar"
+          ).toString();
+          const sanitizedEncryptedString = encryptedString.replace(/\//g, "");
+          //  let ansheading =  await changeLang(item.heading);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          //  console.log(ansheading)
+          return {
+            // heading: item.fields.storyId.fields.heading,
+            // // summary: item.fields.storyId.fields.summary,
+            // summary:item.fields.storyId.fields.preSummary,
+            // thumbnail: item.fields.storyId.fields.thumbnail.fields.file.url,
+            // subcategories: answer,
+            // id:getid.sys.id,
+            // writername:writer.fields.name,
+            // timez:formattedDate
+
+            heading: item.heading,
+            // summary: item.fields.storyId.fields.summary,
+            summary: item.presummary,
+            thumbnail: item.main_image,
+            subcategories: item.category,
+            id: item.id,
+            writername: item.writer,
+            timez: formattedDate,
+          };
+        })
+      );
+
+      // setHerodata(newData)
+
+      if (selectedx === "GB") {
+        setHerodata(newData);
       }
-      if (data?.data?.description === "Unauthorized") {
-        const { metaData } = data.data;
-        router.replace(metaData?.redirectData);
-        return;
+      //  else if (selectedx !== "" && selectedx !== "GB") {
+      //   console.log("here", selectedx);
+      //   const translatedData = await Promise.all(
+      //     newData.map(async (item) => {
+      //       let heading = await changlang(selectedx, item.heading);
+      //       let summary = await changlang(selectedx, item.summary);
+      //       let subcategories = await changlang(selectedx, item.subcategories);
+      //       let timez = await changlang(selectedx, item.timez);
+      //       await new Promise((resolve) => setTimeout(resolve, 1000));
+      //       return {
+      //         heading: heading.data,
+      //         summary: summary.data,
+      //         thumbnail: item.thumbnail,
+      //         subcategories: subcategories.data,
+      //         id: item.id,
+      //         writername: item.writername,
+      //         timez: timez.data,
+      //       };
+      //     })
+      //   );
+      //   setHerodata(translatedData);
+      // } 
+      else {
+        setHerodata(newData);
       }
-      let today = new Date().toISOString();
-      let errorlog = { date: today, error: data };
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
 
-      const raw = JSON.stringify({
-        post: errorlog,
-      });
-
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-
-      fetch(
-        `${window.location.origin}/api/payment/callback/check`,
-        requestOptions
-      )
-        .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.error(error));
-
-      // const {data:resData} = data;
-      if (data.message == "Invalid Transaction") {
-        router.replace("/401");
-      } else {
-        dispatch(
-          setSuccessData({
-            data: {
-              ...data?.data?.metaData,
-              title: data?.data?.description,
-              type: "",
+      const homePageData = {
+        heading:
+          "Dabar | Business Insights, Technology trends and conversations across the Globe.",
+        summary:
+          "Dabar - Your go-to destination for expert insights on Business, Technology, Trends, and Marketing. Dive deep into our enriching content, featuring in-depth analysis, innovative businesses, expert opinions, industry trends that resonate in today's fast-paced landscape.",
+        thumbnail: {
+          fields: {
+            file: {
+              url: "public/assets/img/main.jpg", // Replace with the actual URL
             },
-          })
-        );
-        router.replace("/info");
-      }
-      if (expiredtime != "") {
-        let totalexpiredtime = expiredtime * 60 * 1000;
-        setTimeout(() => {
-          router.replace("/info");
-        }, totalexpiredtime);
-      }
-    }
-  }, [error, router, dispatch, expiredtime]);
-  useEffect(() => {
-    const e = searchParams.get("e");
-    const s = searchParams.get("s");
-    const t = searchParams.get("t");
-    if (!isEmpty(e) && !isEmpty(s) && !isEmpty(t)) {
-      getPaymentInfo({ e, s, t }).unwrap();
-    }
-  }, [getPaymentInfo, searchParams]);
+          },
+        },
+      };
 
-  useEffect(() => {
-    if (carts?.items) {
-      const cartasync = async () => {
-        let changedata = await Promise.all(
-          carts?.items.map(async (item) => {
+      {
+        /* SEO Metadata */
+      }
+      <NextSeo
+        title={homePageData.heading}
+        description={homePageData.summary}
+        openGraph={{
+          type: "website",
+          locale: "en_us",
+          url: "https://thedabar.com",
+          title:
+            "Dabar | Business Insights, Technology trends and conversations across the Globe.",
+          siteName: "Dabar",
+          description:
+            "Dabar - Your go-to destination for expert insights on Business, Technology, Trends, and Marketing.",
+          images: [
+            {
+              url: homePageData.thumbnail?.fields.file.url,
+              alt: "Dabar",
+              type: "image/jpeg", // Update with the actual image type
+              secureUrl: homePageData.thumbnail?.fields.file.url,
+            },
+          ],
+        }}
+      />;
+
+      // const shuffledArray = newData.slice().sort(() => Math.random() - 0.5);
+    };
+
+    HeroAPi();
+
+    const Feature = async () => {
+      // let features = await client.getEntries({content_type:"feature", select:'fields'})
+
+      let urlz = "/api/editor";
+      await apiClient.get("/sanctum/csrf-cookie");
+      let headers = new Headers();
+      headers.append("Content-Type", "application/json");
+      let featuresx = await apiClient.get(urlz, headers);
+
+      const newData = await Promise.all(
+        featuresx.data.success.map(async (item) => {
+          let timez = new Date(item.created_at);
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sept",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const day = timez.getDate();
+          const monthIndex = timez.getMonth();
+          const year = timez.getFullYear();
+          const formattedDate = `${day} ${monthNames[monthIndex]} ${year}`;
+          // console.log(item.fields.storyId.fields.thumbnail.fields.file.url)
+          // console.log(item.fields.storyId.fields.categoryId.sys.id)
+          //  let data = await client.getEntry(item.fields.storyId.fields.categoryId.sys.id);
+          //  let writer = await client.getEntry(item.fields.storyId.fields.writerId.sys.id);
+          //  let getid = await client.getEntry(item.sys.id)
+          //  console.log(data)
+          //  let answer = data.fields.category;
+          const originalString = JSON.stringify(item.id);
+          const encryptedString = CryptoJS.AES.encrypt(
+            originalString,
+            "TheDabar"
+          ).toString();
+          const sanitizedEncryptedString = encryptedString.replace(/\//g, "");
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return {
+            //  heading: item.fields.storyId.fields.heading,
+            // //  summary: item.fields.storyId.fields.summary,
+            // summary:item.fields.storyId.fields.preSummary,
+            //  category: answer,
+            //  thumbnail:item.fields.storyId.fields.thumbnail.fields.file.url,
+            //  writername:writer.fields.name,
+            //  timez:formattedDate,
+            //  id:getid.sys.id,
+
+            heading: item.heading,
+            // summary: item.fields.storyId.fields.summary,
+            summary: item.presummary,
+            thumbnail: item.main_image,
+            subcategories: item.category,
+            id: item.id,
+            writername: item.writer,
+            timez: formattedDate,
+          };
+        })
+      );
+      //  setfeatured(newData)
+      //  eight slide
+
+      if (selectedx === "GB") {
+        setfeatured(newData);
+      } 
+      // else if (selectedx !== "" && selectedx !== "GB") {
+      //   console.log("here", selectedx);
+      //   const translatedData = await Promise.all(
+      //     newData.map(async (item) => {
+      //       let heading = await changlang(selectedx, item.heading);
+      //       let summary = await changlang(selectedx, item.summary);
+      //       let subcategories = await changlang(selectedx, item.subcategories);
+      //       let timez = await changlang(selectedx, item.timez);
+      //       await new Promise((resolve) => setTimeout(resolve, 1000));
+      //       return {
+      //         heading: heading.data,
+      //         summary: summary.data,
+      //         thumbnail: item.thumbnail,
+      //         subcategories: subcategories.data,
+      //         id: item.id,
+      //         writername: item.writername,
+      //         timez: timez.data,
+      //       };
+      //     })
+      //   );
+      //   setfeatured(translatedData);
+      // }
+       else {
+        setfeatured(newData);
+      }
+    };
+
+    Feature();
+
+    const Popular = async () => {
+      let popularstories = await client.getEntries({
+        content_type: "popularstories",
+        select: "fields",
+      });
+
+      let urlz = "/api/popular?page=" + 1;
+      await apiClient.get("/sanctum/csrf-cookie");
+      let headers = new Headers();
+      headers.append("Content-Type", "application/json");
+      let popularx = await apiClient.get(urlz, headers);
+      setlastpopular(popularx.data.success.last_page);
+      const newData = await Promise.all(
+        popularx.data.success.data.map(async (item) => {
+          let timez = new Date(item.created_at);
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sept",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const day = timez.getDate();
+          const monthIndex = timez.getMonth();
+          const year = timez.getFullYear();
+          const formattedDate = `${day} ${monthNames[monthIndex]} ${year}`;
+          //    // console.log(item.fields.storyId.fields.thumbnail.fields.file.url)
+          //   // console.log(item.fields.storyId.fields.categoryId.sys.id)
+          //  let data = await client.getEntry(item.fields.storyId.fields.categoryId.sys.id);
+          //  let writer = await client.getEntry(item.fields.storyId.fields.writerId.sys.id);
+          //  let getid = await client.getEntry(item.sys.id)
+          // //  console.log(data)
+          //  let answer = data.fields.category;
+          //              const originalString = JSON.stringify(item.id);
+          // const encryptedString = CryptoJS.AES.encrypt(originalString, 'TheDabar').toString();
+          // const sanitizedEncryptedString = encryptedString.replace(/\//g, '');
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return {
+            //  heading: item.fields.storyId.fields.heading,
+            // //  summary: item.fields.storyId.fields.summary,
+            // summary:item.fields.storyId.fields.preSummary,
+            //  category: answer,
+            //  thumbnail:item.fields.storyId.fields.thumbnail.fields.file.url,
+            //  writername:writer.fields.name,
+            //  timez:formattedDate,
+            //  id:getid.sys.id,
+            heading: item.heading,
+            // summary: item.fields.storyId.fields.summary,
+            summary: item.presummary,
+            thumbnail: item.main_image,
+            subcategories: item.category,
+            id: item.id,
+            writername: item.writer,
+            timez: formattedDate,
+          };
+        })
+      );
+
+      //  setPopular(newData)
+
+      if (selectedx === "GB") {
+        setPopular(newData);
+      } 
+      // else if (selectedx !== "" && selectedx !== "GB") {
+      //   console.log("here", selectedx);
+      //   const translatedData = await Promise.all(
+      //     newData.map(async (item) => {
+      //       let heading = await changlang(selectedx, item.heading);
+      //       let summary = await changlang(selectedx, item.summary);
+      //       let subcategories = await changlang(selectedx, item.subcategories);
+      //       let timez = await changlang(selectedx, item.timez);
+      //       await new Promise((resolve) => setTimeout(resolve, 1000));
+      //       return {
+      //         heading: heading.data,
+      //         summary: summary.data,
+      //         thumbnail: item.thumbnail,
+      //         subcategories: subcategories.data,
+      //         id: item.id,
+      //         writername: item.writername,
+      //         timez: timez.data,
+      //       };
+      //     })
+      //   );
+      //   setPopular(translatedData);
+      // } 
+      else {
+        setPopular(newData);
+      }
+    };
+
+    Popular();
+
+    // const Local = async()=>{
+    //   let story = await client.getEntries({content_type:"currentstories",select:'fields', })
+    //   const newData = await Promise.all(
+    //     story?.items.map(async (item) => {
+    //       let timez = new Date(item.fields.storyId.sys.updatedAt)
+    //         const monthNames = [
+    //           "Jan", "Feb", "Mar",
+    //           "Apr", "May", "Jun", "Jul",
+    //           "Aug", "Sept", "Oct",
+    //           "Nov", "Dec"
+    //         ];
+    //         const day = timez.getDate();
+    //         const monthIndex = timez.getMonth();
+    //         const year = timez.getFullYear();
+    //         const formattedDate = `${day} ${monthNames[monthIndex]} ${year}`;
+
+    //       let data = await client.getEntry(item.fields.storyId.fields.categoryId.sys.id);
+    //       let writer = await client.getEntry(item.fields.storyId.fields.writerId.sys.id)
+    //       let answer = data.fields.category;
+    //        let answriter = writer.fields.name
+    //        return {
+    //         heading: item.fields.storyId.fields.heading,
+    //         summary: item.fields.storyId.fields.summary,
+    //         presummary:item.fields.storyId.fields.preSummary,
+    //         thumbnail:item.fields.storyId.fields.thumbnail.fields.file.url,
+    //         category: answer,
+    //         writer:answriter,
+    //         id:item.id,
+    //         timez:formattedDate
+    //        };
+    //      })
+    //    );
+    //  localStorage.setItem("stories", JSON.stringify(newData))
+    // }
+    // Local()
+
+    var myHeaders = new Headers();
+    myHeaders.append("Accept", "application/json");
+    myHeaders.append(
+      "Cookie",
+      "__cf_bm=i9nmscfUnJa3HYnpNFfHx9p5E_dZSH9Xt.gikiporXM-1702413803-1-AfR+pfSKU0ClDff2SKh3SCBVExJTfqw82Oag2ZBY1WPjslTJIt02r58noo7UKDFffru20dEAvEBqxh0/lR+kS4k="
+    );
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    fetch(
+      "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&vs_currency=eur&vs_currency=jpy",
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        let info = result
+          .map((item) => {
+            const roundedNumber = parseFloat(item.atl.toFixed(2));
             return {
-              applicationId: item.applicationId,
-              applicant_name: item.applicant_name,
-              applicationType: item.applicationType,
-              currency: item.currency,
-              price: ` ${item.currency} ${item.price}`,
-              cal_price: item.price,
-              reference_number: item.reference_number,
-              transaction_fee: item.transaction_fee,
-              hasError: item.hasError,
+              symbol: item.symbol,
+              atl: roundedNumber,
+              current_price: item.current_price,
             };
           })
-        );
+          .slice(0, 14);
 
-        setConvertedCart(changedata);
+        setcyptocoin((cyptocoin) => info);
+      })
+      .catch((error) => console.log("error", error));
+  }, [selectedx]);
+
+  const [testbody, Settestbody] = useState([]);
+
+  useEffect(() => {
+    const Feature = async () => {
+      // select:'fields'
+      let stories = await client.getEntries({ content_type: "stories" });
+      // console.log(stories)
+      const options = {
+        renderNode: {
+          "embedded-asset-block": (node) => {
+            return (
+              <img
+                src={node.data.target.fields.file.url}
+                alt={node.data.target.fields.description}
+              />
+            );
+          },
+        },
       };
+      // console.log(stories);
+      const newData = await Promise.all(
+        stories?.items.map(async (item) => {
+          // console.log(item)
+          // const contentbody = documentToReactComponents(item.fields.body, options);
+          let word = JSON.stringify(item.fields.body);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          // console.log(item.fields.mainImage?.fields.file.url)
+          return {
+            heading: item.fields.heading,
+            body: word,
+            summary: item.fields.summary,
+            mainImage: item.fields.mainImage?.fields.file.url,
+            writer: item.fields.writerId.fields.name,
+            readTime: item.fields.readTime,
+            category: item.fields.categoryId.fields.category,
+            date: item.sys.createdAt,
+          };
+        })
+      );
+      // console.log(newData)
+      // const apiClient = axios.create({
+      //   baseURL: "http://127.0.0.1:8000/",
+      //   withCredentials: true
+      // });
 
-      cartasync();
-    }
-  }, [carts?.items]);
+      // for (let i = 0; i < newData.length; i++) {
+      //   let item = newData[i];
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src =
-      "//cdn.cookie-script.com/s/26d6befb85328706dbf0307ed94ed89d.js";
-    script.async = true;
-    document.body.appendChild(script);
+      //   let formData = new FormData();
+      //   formData.append('presummary',  item.summary)
+      //   formData.append('read_time',  item.readTime)
+      //   formData.append('category',  item.category)
+      //   formData.append('writer',  item.writer)
+      //   formData.append('main_image', item.mainImage)
+      //   formData.append('body', item.body)
+      //   formData.append('presummary', item.summary)
+      //   formData.append("heading", item.heading)
+      //   formData.append("date", item.date)
 
-    return () => {
-      document.body.removeChild(script);
+      //   let url = 'api/stories_from_client';
+
+      //   apiClient.get('/sanctum/csrf-cookie').then(() => {
+      //     apiClient.post(url, formData, {
+      //       // headers: {
+      //       //   "Authorization": "Bearer " + local.token,
+      //       // }
+      //     }).then(res => {
+      //       console.log(res);
+      //     });
+      //   });
+      // }
+
+      //   const newData = await Promise.all(
+      //     features?.items.map(async (item) => {
+
+      //       let timez = new Date(item.fields.storyId.sys.updatedAt)
+      //       const monthNames = [
+      //        "Jan", "Feb", "Mar",
+      //        "Apr", "May", "Jun", "Jul",
+      //        "Aug", "Sept", "Oct",
+      //        "Nov", "Dec"
+      //      ];
+      //      const day = timez.getDate();
+      //       const monthIndex = timez.getMonth();
+      //       const year = timez.getFullYear();
+      //       const formattedDate = `${day} ${monthNames[monthIndex]} ${year}`;
+      //        // console.log(item.fields.storyId.fields.thumbnail.fields.file.url)
+      //       // console.log(item.fields.storyId.fields.categoryId.sys.id)
+      //      let data = await client.getEntry(item.fields.storyId.fields.categoryId.sys.id);
+      //      let writer = await client.getEntry(item.fields.storyId.fields.writerId.sys.id);
+      //      let getid = await client.getEntry(item.sys.id)
+      //     //  console.log(data)
+      //      let answer = data.fields.category;
+
+      //      return {
+      //        heading: item.fields.storyId.fields.heading,
+      //       //  summary: item.fields.storyId.fields.summary,
+      //       summary:item.fields.storyId.fields.preSummary,
+      //        category: answer,
+      //        thumbnail:item.fields.storyId.fields.thumbnail.fields.file.url,
+      //        writername:writer.fields.name,
+      //        timez:formattedDate,
+      //        id:getid.sys.id,
+      //      };
+      //    })
+      //  );
+      //  setfeatured(newData)
     };
+
+    Feature();
   }, []);
+  const [currentpopular, setcurrentpopular] = useState(1);
 
-  const [isOutline, SetisOutline] = useState(true);
-
-  useEffect(() => {
-    const handleKeyPress = (event) => {
-      if (event.key === "Enter" && step == 0) {
-        setStep(1);
-        SetisOutline(false);
-      } else if (event.key === "Enter" && step == 1) {
-        setStep(2);
-        SetisOutline(false);
+  const handleviewmore = async (e) => {
+    e.preventDefault();
+    const changlang = async (selectedx, word) => {
+      const options = {
+        method: "POST",
+        url: "https://deepl-translator2.p.rapidapi.com/translate",
+        headers: {
+          "content-type": "application/json",
+          "X-RapidAPI-Key":
+            "7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0",
+          "X-RapidAPI-Host": "deepl-translator2.p.rapidapi.com",
+        },
+        data: {
+          source_lang: "EN",
+          target_lang: selectedx,
+          text: word,
+        },
+      };
+      try {
+        let res = await axios.request(options);
+        return res.data;
+      } catch (error) {
+        console.log(error);
       }
     };
-    // Add event listener
-    document.addEventListener("keydown", handleKeyPress);
-    // Cleanup event listener on component unmount
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [step]);
+    if (currentpopular < lastpopular) {
+      let answerxs = currentpopular + 1;
+      setcurrentpopular(answerxs);
+      let urlz = "/api/popular?page=" + answerxs;
+      await apiClient.get("/sanctum/csrf-cookie");
+      let headers = new Headers();
+      headers.append("Content-Type", "application/json");
+      let popularx = await apiClient.get(urlz, headers);
+      console.log(popularx.data.success.data);
+      const newData = await Promise.all(
+        popularx.data.success.data.map(async (item) => {
+          let timez = new Date(item.created_at);
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sept",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const day = timez.getDate();
+          const monthIndex = timez.getMonth();
+          const year = timez.getFullYear();
+          const formattedDate = `${day} ${monthNames[monthIndex]} ${year}`;
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return {
+            heading: item.heading,
+            summary: item.presummary,
+            thumbnail: item.main_image,
+            subcategories: item.category,
+            id: item.id,
+            writername: item.writer,
+            timez: formattedDate,
+          };
+        })
+      );
 
-  // useEffect(() => {
-  //   function handleEnterKey(event) {
-  //     if (event.key == 'Enter' && step == 1 ) {
-  //       setStep(2)
-  //       SetisOutline(false)
+      let newDataCopy = [...newData];
+      let dataz = [...popular, ...newDataCopy];
+      //  setPopular(dataz);
+
+      if (selectedx === "GB") {
+        setPopular(dataz);
+      } 
+      // else if (selectedx !== "" && selectedx !== "GB") {
+      //   const translatedData = await Promise.all(
+      //     dataz.map(async (item) => {
+      //       let heading = await changlang(selectedx, item.heading);
+      //       let summary = await changlang(selectedx, item.summary);
+      //       let subcategories = await changlang(selectedx, item.subcategories);
+      //       let timez = await changlang(selectedx, item.timez);
+      //       await new Promise((resolve) => setTimeout(resolve, 1000));
+      //       return {
+      //         heading: heading.data,
+      //         summary: summary.data,
+      //         thumbnail: item.thumbnail,
+      //         subcategories: subcategories.data,
+      //         id: item.id,
+      //         writername: item.writername,
+      //         timez: timez.data,
+      //       };
+      //     })
+      //   );
+      //   setPopular(translatedData);
+      // } 
+      else {
+        setPopular(dataz);
+      }
+    } else if (currentpopular == lastpopular) {
+      setcurrentpopular(1);
+      let urlz = "/api/popular?page=" + 1;
+      await apiClient.get("/sanctum/csrf-cookie");
+      let headers = new Headers();
+      headers.append("Content-Type", "application/json");
+      let popularx = await apiClient.get(urlz, headers);
+
+      const newData = await Promise.all(
+        popularx.data.success.data.map(async (item) => {
+          let timez = new Date(item.created_at);
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sept",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const day = timez.getDate();
+          const monthIndex = timez.getMonth();
+          const year = timez.getFullYear();
+          const formattedDate = `${day} ${monthNames[monthIndex]} ${year}`;
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return {
+            heading: item.heading,
+            summary: item.presummary,
+            thumbnail: item.main_image,
+            subcategories: item.category,
+            id: item.id,
+            writername: item.writer,
+            timez: formattedDate,
+          };
+        })
+      );
+
+      // setPopular(newData);
+
+      if (selectedx === "GB") {
+        setPopular(newData);
+      }
+      //  else if (selectedx !== "" && selectedx !== "GB") {
+      //   console.log("here", selectedx);
+      //   const translatedData = await Promise.all(
+      //     newData.map(async (item) => {
+      //       let heading = await changlang(selectedx, item.heading);
+      //       let summary = await changlang(selectedx, item.summary);
+      //       let subcategories = await changlang(selectedx, item.subcategories);
+      //       let timez = await changlang(selectedx, item.timez);
+      //       await new Promise((resolve) => setTimeout(resolve, 1000));
+      //       return {
+      //         heading: heading.data,
+      //         summary: summary.data,
+      //         thumbnail: item.thumbnail,
+      //         subcategories: subcategories.data,
+      //         id: item.id,
+      //         writername: item.writername,
+      //         timez: timez.data,
+      //       };
+      //     })
+      //   );
+      //   setPopular(translatedData);
+      // } 
+      else {
+        setPopular(newData);
+      }
+    }
+  };
+
+  // console.log(selectedx)
+
+  useEffect(() => {
+    let popular_post = document.querySelector(".popular_post");
+    let trending_news = document.querySelector(".trending_news");
+    let tending_more = document.querySelector(".tending_more");
+    let featured_editor = document.querySelector(".featured_editor");
+    let editor_choice = document.querySelector(".editor_choice");
+    let editor_more = document.querySelector(".editor_more");
+    let stories_popular = document.querySelector(".stories_popular");
+    let popular_stories = document.querySelector(".popular_stories");
+    let stories_more = document.querySelector(".stories_more");
+
+    const changlang = async (selectedx, word) => {
+      if (selectedx != "" && word != "") {
+        const options = {
+          method: "POST",
+          url: "https://deepl-translator2.p.rapidapi.com/translate",
+          headers: {
+            "content-type": "application/json",
+            "X-RapidAPI-Key":
+              "7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0",
+            "X-RapidAPI-Host": "deepl-translator2.p.rapidapi.com",
+          },
+          data: {
+            source_lang: "EN",
+            target_lang: selectedx,
+            text: word,
+          },
+        };
+        try {
+          let res = await axios.request(options);
+          return res?.data;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    const subheader = async () => {
+      // let anspopular_post = await changlang(selectedx, popular_post.innerText);
+      // let anstrending_news = await changlang(
+      //   selectedx,
+      //   trending_news.innerText
+      // );
+      // let anstending_more = await changlang(selectedx, tending_more.innerText);
+      // let ansfeatured_editor = await changlang(
+      //   selectedx,
+      //   featured_editor.innerText
+      // );
+      // let anseditor_choice = await changlang(
+      //   selectedx,
+      //   editor_choice.innerText
+      // );
+      // let anseditor_more = await changlang(selectedx, editor_more.innerText);
+      // let ansstories_popular = await changlang(
+      //   selectedx,
+      //   stories_popular.innerText
+      // );
+      // let anspopular_stories = await changlang(
+      //   selectedx,
+      //   popular_stories.innerText
+      // );
+      // let ansstories_more = await changlang(selectedx, stories_more.innerText);
+
+      if (selectedx == "GB") {
+        popular_post.textContent == "Popular Posts";
+        trending_news.textContent = "Trending News";
+        tending_more.textContent = "More Post";
+        featured_editor.textContent = "Featured";
+        editor_choice.textContent = "Editor's Choice";
+        editor_more.textContent = "More Featured Post";
+        stories_popular.textContent = "Stories";
+        popular_stories.textContent = "Popular Stories";
+        stories_more.textContent = "More Post";
+      } 
+      
+      // else {
+      //   popular_post.textContent = anspopular_post.data;
+      //   trending_news.textContent = anstrending_news.data;
+      //   tending_more.innerHTML = anstending_more.data;
+      //   featured_editor.innerHTML = ansfeatured_editor.data;
+      //   editor_choice.innerHTML = anseditor_choice.data;
+      //   editor_more.innerHTML = anseditor_more.data;
+      //   stories_popular.innerHTML = ansstories_popular.data;
+      //   popular_stories.innerHTML = anspopular_stories.data;
+      //   stories_more.innerHTML = ansstories_more.data;
+      // }
+    };
+
+    subheader();
+  }, [selectedx]);
+
+  useEffect(() => {
+    const move_pic = async () => {
+      let urlzx = "/api/uservideos?page=" + 1;
+      await apiClient.get("/sanctum/csrf-cookie");
+      let headers = new Headers();
+      headers.append("Content-Type", "application/json");
+      let moving_pic = await apiClient.get(urlzx, headers);
+      setVideos(moving_pic.data.message.data);
+      setLast_Num_Video(moving_pic.data.message.last_page);
+    };
+    move_pic();
+  }, []);
+
+  // changeLang('my name is stephen okpeku')
+  //  const [langchan, setlangchan] = useState("")
+  //   const changeLang = (word)=>{
+  //     if(selectedx == 'GB'){
+  //       console.log('first', selectedx)
+  //       return word
+  //     }else if(selectedx != "" &&  selectedx != 'GB'){
+
+  //       const options = {
+  //         method: 'POST',
+  //         url: 'https://deepl-translator2.p.rapidapi.com/translate',
+  //         headers: {
+  //           'content-type': 'application/json',
+  //           'X-RapidAPI-Key': '7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0',
+  //           'X-RapidAPI-Host': 'deepl-translator2.p.rapidapi.com'
+  //         },
+  //         data: {
+  //           source_lang: 'EN',
+  //           target_lang: selectedx,
+  //           text: word
+  //         }
+  //       };
+
+  //       try {
+  //         axios.request(options).then(res=>setlangchan(res.data));
+  //         console.log(langchan)
+  //         return langchan.data;
+  //       }catch(error) {
+  //         console.error(error);
+  //       }
+
+  //     }else{
+  //       return word
+
   //     }
   //   }
 
-  //   window.addEventListener('keydown', handleEnterKey);
-
-  //   return () => {
-  //     window.removeEventListener('keydown', handleEnterKey);
-  //   };
-  // }, [step]);
-
-  const handleStepView = (step) => {
-    switch (step) {
-      case 0:
-        return (
-          <div>
-            {!isEmpty(converted_cart) && (
-              <DataTable columns={columns} data={converted_cart} />
-            )}
-          </div>
-        );
-      case 1:
-        return (
-          <div className="flex flex-col w-full h-full flex-1 bg-red-700">
-            <Refund
-              setIsAccept={setIsAccept}
-              isAccept={isAccept}
-              policy={refundPolicy}
-              notice={importantNotice}
-              acceptNotice={acceptNotice}
-              setAcceptNotice={setAcceptNotice}
-              step={step}
-            />
-          </div>
-        );
-
-      default:
-        return (
-          <>
-            {!isEmpty(paymentCodes) &&
-              !isEmpty(paymentTypes) &&
-              !isEmpty(carts) && (
-                <Sidebar
-                  paymentCodes={paymentCodes}
-                  paymentType={paymentTypes}
-                  carts={carts}
-                  back={() => setStep(1)}
-                  isAccept={acceptNotice}
-                />
-              )}
-          </>
-        );
-    }
-  };
-
-  const renderButtons = (step) => {
-    switch (step) {
-      case 0:
-        return (
-          <div className="w-full py-4">
-            <Button
-              ref={inputRef}
-              id="stepOne"
-              name="stepOne"
-              className={`text-xs w-full  bg-primary hover:bg-primary hover:opacity-75 hover:text-white text-white outline-none border-0 mt-4 capitalize font-bold focus:outline-none focus:ring-2 focus:ring-black`}
-              variant="outline"
-              onClick={() => setStep(1)}
-            >
-              Continue
-            </Button>
-          </div>
-        );
-
-      case 1:
-        return (
-          <div className="w-full py-4">
-            <Button
-              id="stepTwo"
-              name="stepTwo"
-              className="text-xs w-full  bg-primary hover:bg-primary hover:opacity-75 hover:text-white text-white  border-0 mt-3 capitalize font-bold focus:outline-none focus:ring-2 focus:ring-black "
-              variant="outline"
-              disabled={!acceptNotice}
-              // isLoading={apiLoading}
-              // onClick={handleSubmit(handleValidation, (error) =>
-              //   console.log(error)
-              // )}
-              onClick={() => setStep(2)}
-            >
-              Continue
-            </Button>
-          </div>
-        );
-
-      default:
-        return;
-    }
+  const handleNext = async (ans) => {
+    let number = ans.selected + 1;
+    const move_pic = async () => {
+      let urlzx = "/api/uservideos?page=" + number;
+      await apiClient.get("/sanctum/csrf-cookie");
+      let headers = new Headers();
+      headers.append("Content-Type", "application/json");
+      let moving_pic = await apiClient.get(urlzx, headers);
+      setVideos(moving_pic.data.message.data);
+      setLast_Num_Video(moving_pic.data.message.last_page);
+    };
+    move_pic();
   };
 
   return (
-    <div className=" w-fulll  sm:w-full md:w-full lg:w-full">
-      <Head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Payment Gateway</title>
-        <meta name="title" content="Payment Gateway" />
-        <meta
-          name="keywords"
-          content="payment gateway, seamless payment, online, passport, visa, visa on arrival"
-        />
-        <meta property="og:titlee" content="Payment gateway" />
-        <meta property="og:description" content=" Payment gateway" />
-      </Head>
+    <>
+      <Layout
+        headerStyle={6}
+        footerStyle={3}
+        selectedx={selectedx}
+        setSelectedx={setSelectedx}
+        footerClass="black-bg"
+        logoWhite
+      >
+        <div className="slider__marquee clearfix">
+          <div className="marquee_mode">
+            <Marquee className="js-marquee" pauseOnHover={true}>
+              {cyptocoin.map((item, index) => {
+                return (
+                  <h6 className="item" key={index}>
+                    {item.symbol} ${item.current_price} <span>+{item.atl}</span>
+                  </h6>
+                );
+              })}
+            </Marquee>
+          </div>
+        </div>
+        <section className="tgbanner__area-five pt-20 pb-30">
+          <div className="container">
+            <div className="row row--10">
+              {Herodata && Herodata.length > 0 ? (
+                <div className="col-lg-12 col-xl-6 col-md-12 col-12 mt--20 ">
+                  <div className="tgbanner__five-item big-post">
+                    <div className="tgbanner__five-thumb tgImage__hover   ">
+                      <Link href={`/blog/${Herodata[0].id}`}>
+                        <img src={Herodata[0].thumbnail} alt="img" />
+                      </Link>
+                    </div>
+                    <div className="tgbanner__five-content">
+                      <Link
+                        href={`/business?hello=${encodeURIComponent(
+                          Herodata[0].subcategories
+                        )}`}
+                        className="tags text-orange text-uppercase fw-bold"
+                      >
+                        {Herodata[0].subcategories}
+                      </Link>
+                      <h2 className="title tgcommon__hover mt-4 mb-4 font-weight-bold">
+                        <Link href={`/blog/${Herodata[0].id}`}>
+                          {Herodata[0].heading}
+                        </Link>
+                        <p className="custom-paragraph-style text-white">
+                          {Herodata[0].summary == undefined ||
+                          Herodata[0].summary == null
+                            ? ""
+                            : Herodata[0].summary.length > 100
+                            ? Herodata[0].summary.substr(0, 120) + "..."
+                            : Herodata[0].summary}
+                        </p>
+                      </h2>
 
-      {isLoading && <Loader isLoading={isLoading} />}
-      <>
-        {!isEmpty(cartInfo) && (
-          <main
-            className={`flex min-h-screen bg-background  relative  text-foreground flex-col items-center ${aeonik.variable}`}
-          >
-            <Header name={cartInfo?.client_name} logo={carts?.client_logo} />
-            <div className=" md:mt-[8vh] flex-1 h-[100%] mx-0 w-full px-4 md:px-6 lg:px-12 xl:px-24 z-50">
-              <article className="w-full flex flex-col gap-4">
-                <div className="flex space-x-2 py-2 px-1 rounded-md bg-[#FFEFD2] items-center ">
-                  <Avatar className="w-5 h-5 md:h-5 md:w-5">
-                    <AvatarImage src="./assets/info-circle.svg" alt="@shadcn" />
-                    <AvatarFallback>logo</AvatarFallback>
-                  </Avatar>
-                  <p className="font-aeonik text-[14px] font-light text[#101010]">
-                    Please{" "}
-                    <strong className="font-aeonik text-[12px] font-bold">
-                      DO NOT
-                    </strong>{" "}
-                    refresh this page. Before beginning a new application and/or
-                    making a payment, please visit the embassy’s website or
-                    immigration office for interview information, dates, times
-                    and hours of operation.
-                  </p>
-                </div>
-
-                <div className=" flex flex-col  w-full bg-background gap-3">
-                  <p className=" my-2 font-aeonik font-[700] font-16  text-black font-[24px]">
-                    Complete checkout
-                  </p>
-                  <p className="font-aeonik  font-light text-muted-foreground">
-                    Review orders and proceed to make payment
-                  </p>
-                </div>
-                {/* w-11/12 sm:w-11/12 md:w-[68%] lg:w-[68%] */}
-                <div className="w-full sm:w-11/12 md:w-[68%] lg:w-[68%] mt-4">
-                  <div className="w-full flex flex-row items-center space-x-2 sm:space-x-2 md:space-x-5 lg:space-x-5 border-b border-[#E4E7EC] ">
-                    {stepContent.map((item, index) => (
-                      <StepItem
-                        setStep={setStep}
-                        item={item}
-                        key={index}
-                        currentStep={step}
-                        acceptNotice={acceptNotice}
-                      />
-                    ))}
+                      <ul className="tgbanner__content-meta list-wrap">
+                        <li>
+                          <Link href={`/blog/${Herodata[0].id}`}>
+                            {Herodata[0].writername}
+                          </Link>
+                        </li>
+                        <li>{Herodata[0].timez}</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </article>
+              ) : (
+                ""
+              )}
 
-              <div className=" h-full  gap-2 w-full sm:gap-2 sm:w-full md:w-full  md:flex-col   lg:flex  lg:flex-row  lg:flex-1 lg:w-full lg:space-x-6 mt-2">
-                <div className=" h-full w-full sm:w-full md:w-[70%] lg:w-[70%]  ">
-                  {handleStepView(step)}
+              <div className="col-lg-12 col-xl-6 col-md-12 col-12 mt_lg--20 mt_md--20 mt_sm--20">
+                {Herodata && Herodata.length > 0 ? (
+                  <div className="tgbanner__five-item small-post">
+                    <div className="tgbanner__five-thumb tgImage__hover   ">
+                      <Link href={`/blog/${Herodata[1].id}`}>
+                        <img src={Herodata[1].thumbnail} alt="img" />
+                      </Link>
+                    </div>
+                    <div className="tgbanner__five-content">
+                      <Link
+                        href={`/business?hello=${encodeURIComponent(
+                          Herodata[1].subcategories
+                        )}`}
+                        className="tags text-orange text-uppercase fw-bold "
+                      >
+                        {Herodata[1].subcategories}
+                      </Link>
+                      <h2 className="title tgcommon__hover mt-2 mb-1">
+                        <Link href={`/blog/${Herodata[1].id}`}>
+                          {Herodata[1].heading}
+                        </Link>
+                      </h2>
+                      <ul className="tgbanner__content-meta list-wrap">
+                        <li>
+                          <Link href={`/blog/${Herodata[1].id}`}>
+                            {Herodata[1].writername}
+                          </Link>
+                        </li>
+                        <li>{Herodata[1].timez}</li>
+                      </ul>
+                    </div>
+                  </div>
+                ) : (
+                  ""
+                )}
+
+                <div className="row row--10">
+                  {Herodata.slice(2, 4)?.map((item) => {
+                    return (
+                      <div className="col-lg-6 col-md-6 col-sm-6 col-12 mt--20">
+                        <div className="tgbanner__five-item small-post">
+                          <div className="tgbanner__five-thumb tgImage__hover   ">
+                            <Link href="/blog/101">
+                              <img src={item.thumbnail} alt="img" />
+                            </Link>
+                          </div>
+                          <div className="tgbanner__five-content">
+                            <Link
+                              href={`/business?hello=${encodeURIComponent(
+                                item.subcategories
+                              )}`}
+                              className="tags text-orange text-uppercase fw-bold"
+                            >
+                              {item.subcategories}
+                            </Link>
+                            <h2 className="title tgcommon__hover mt-2 mb-2">
+                              <Link href={`/blog/${item.id}`}>
+                                {item.heading}
+                              </Link>
+                            </h2>
+                            <ul className="tgbanner__content-meta list-wrap">
+                              <li>
+                                <Link href={`/blog/${item.id}`}>
+                                  {item.writername}
+                                </Link>
+                              </li>
+                              <li>{item.timez}</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-                <div className=" w-[100%] flex flex-col sm:w-[100%] sm:flex sm:flex-col md:w-[30%] md:flex md:flex-col lg:w-[30%] lg:flex lg:flex-col ">
-                  <div className="w-full mt-2 sm:mt-2 md:mt-2 lg:mt-0">
-                    <Summary
-                      policy={refundPolicy}
-                      notice={importantNotice}
-                      transaction={carts?.cart}
-                      carts={carts}
-                      totals={carts?.total}
-                      symbol={carts.currency_symbol}
-                      sub_total={carts.sub_total}
-                      setIsAccept={setIsAccept}
-                      isAccept={isAccept}
-                      hasError={hasError}
-                    />
-                    {renderButtons(step)}
-                    
+        <section className="trending-post-area section__hover-line pt-25">
+          <div className="container">
+            <div className="section__title-wrap mb-40">
+              <div className="row align-items-end">
+                <div className="col-sm-6">
+                  <div className="section__title">
+                    <span className="section__sub-title popular_post">
+                      Popular Posts
+                    </span>
+                    <h3 className="section__main-title trending_news">
+                      Trending News
+                    </h3>
+                  </div>
+                </div>
+                <div className="col-sm-6">
+                  <div className="section__read-more text-start text-sm-end">
+                    <Link href="/blog" className="tending_more">
+                      More Post <i className="far fa-long-arrow-right" />
+                    </Link>
                   </div>
                 </div>
               </div>
             </div>
-            {process.env.HAS_CONTACT && <Contact />}
-          </main>
-        )}
-      </>
+            <div className="trending__slider">
+              <div className="swiper-container trending-active">
+                <TrendingSlider selectedx={selectedx} showItem={4} />
+              </div>
+            </div>
+          </div>
+        </section>
+        <div className="advertisement pt-45 pb-10">
+          <div className="container">
+            <div className="col-12">
+              <div className="advertisement__image text-center">
+                <Link href="/#">
+                  <img
+                    src="/assets/img/others/advertisement.png"
+                    alt="advertisement"
+                  />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+        <section className="featured-post-area section__hover-line pt-75">
+          <div className="container">
+            <div className="section__title-wrap mb-40">
+              <div className="row align-items-end">
+                <div className="col-sm-6">
+                  <div className="section__title">
+                    <span className="section__sub-title featured_editor">
+                      Featured
+                    </span>
+                    <h3 className="section__main-title editor_choice">
+                      Editor's Choice
+                    </h3>
+                  </div>
+                </div>
+                <div className="col-sm-6">
+                  <div className="section__read-more text-start text-sm-end">
+                    <Link href="/blog" className="editor_more">
+                      More Featured Post{" "}
+                      <i className="far fa-long-arrow-right" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="row">
+              {featured.length > 0
+                ? featured.map((item, i) => (
+                    <div className="col-lg-4 col-sm-6" key={i}>
+                      <div className="featured__post">
+                        <div
+                          className="featured__thumb"
+                          style={{
+                            backgroundImage: `url(${item.thumbnail})`,
+                          }}
+                        ></div>
+                        <div className="featured__content">
+                          <ul className="tgbanner__content-meta list-wrap">
+                            <li className="category">
+                              <Link
+                                href={`/business?hello=${encodeURIComponent(
+                                  item.subcategories
+                                )}`}
+                              >
+                                {item.subcategories}
+                              </Link>
+                            </li>
+                          </ul>
+                          <ul className="tgbanner__content-meta list-wrap">
+                            <li className="text-black">
+                              <Link href={`/blog/${item.id}`}>
+                                By {item.writername}
+                              </Link>
+                            </li>
+                          </ul>
+                          <h4 className="title tgcommon__hover">
+                            <Link href={`/blog/${item.id}`}>
+                              {item.heading}
+                            </Link>
+                          </h4>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                : []}
+            </div>
+          </div>
+        </section>
+        <div className="advertisement pt-45 pb-10">
+          <div className="container">
+            <div className="col-12">
+              <div className="advertisement__image text-center">
+                <Link href="/#">
+                  <img
+                    src="/assets/img/others/advertisement.png"
+                    alt="advertisement"
+                  />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section className="video-post-area section__hover-line white-bg pt-75 pb-80">
+  <div className="container">
+    <div className="section__title-wrap mb-40">
+      <div className="row align-items-end">
+        <div className="col-sm-6">
+          <div className="section__title">
+            <span className="section__sub-title">Video</span>
+            <h3 className="section__main-title">Recent Video Post</h3>
+          </div>
+        </div>
+        <div className="col-sm-6">
+          <div className="section__read-more text-start text-sm-end">
+            <Link href="https://www.youtube.com/@TheDabarmedia" target="_blank">
+              More Video Post <i className="far fa-long-arrow-right" />
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
+    <div className="row">
+      <div className="col-xl-8 col-lg-7">
+        {videos.length > 0
+          ? videos.slice(0, 1).map((item, index) => {
+              console.log("hey now", item);
+              let timez = new Date(item.created_at);
+              const monthNames = [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sept",
+                "Oct",
+                "Nov",
+                "Dec",
+              ];
+              const day = timez.getDate();
+              const monthIndex = timez.getMonth();
+              const year = timez.getFullYear();
+              const formattedDate = `${day} ${monthNames[monthIndex]} ${year}`;
+              return (
+                <div key={index} className="video__post-item big-post">
+                  <div className="video__post-thumb">
+                    <Link href={item.url}>
+                      <img src={item.file} alt="img" />
+                    </Link>
+                    <a
+                      onClick={() => setOpen(item.writername)}
+                      className="popup-video"
+                    >
+                      <i className="fas fa-play" />
+                    </a>
+                  </div>
+                  <div className="video__post-content">
+                    <ul className="tgbanner__content-meta list-wrap">
+                      <li className="category">
+                        <Link href={item.url}>{item.category}</Link>
+                      </li>
+                      <li>{formattedDate}</li>
+                    </ul>
+                    <h3 className="title tgcommon__hover">
+                      <Link href={item.url}>{item.title}</Link>
+                    </h3>
+                  </div>
+                  <ModalVideo
+                    channel="youtube"
+                    autoplay
+                    isOpen={isOpen === item.writername}
+                    videoId={item.writername}
+                    onClose={() => setOpen(null)}
+                  />
+                </div>
+              );
+            })
+          : ""}
+      </div>
+      <div className="col-xl-4 col-lg-5">
+        {videos.length > 0
+          ? videos.slice(1, 5).map((item, i) => (
+              <div className="video__post-item side-post" key={i}>
+                <div className="video__post-thumb tgImage__hover">
+                  <a
+                    onClick={() => setOpen(item.writername)}
+                    className="popup-video"
+                  >
+                    <img src={item.file} alt="img" />
+                    <i className="fas fa-play" />
+                  </a>
+                </div>
+                <div className="video__post-content">
+                  <ul className="tgbanner__content-meta list-wrap">
+                    <li className="category">
+                      <Link href={item.url}>{item.category}</Link>
+                    </li>
+                    {/* <li>
+                      <span className="by">By</span>{" "}
+                      <Link href={item.url}>{item.writername}</Link>
+                    </li> */}
+                  </ul>
+                  <h3 className="title tgcommon__hover">
+                    <Link href={item.url}>{item.title}</Link>
+                  </h3>
+                </div>
+                <ModalVideo
+                  channel="youtube"
+                  autoplay
+                  isOpen={isOpen === item.writername}
+                  videoId={item.writername}
+                  onClose={() => setOpen(null)}
+                />
+              </div>
+            ))
+          : ""}
+      </div>
+      {videos.length == 0 ? (
+        <article
+          style={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "80px",
+          }}
+        >
+          No Videos Yet
+        </article>
+      ) : (
+        ""
+      )}
+
+      <section
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {videos.length < 6 ? (
+          ""
+        ) : (
+          <div className="pagination__wrap">
+            <button className="btn" onClick={(e) => handleviewmore(e)}>
+              <span
+                className="text"
+                onClick={() => {
+                  window.location.href = "https://www.youtube.com/";
+                }}
+              >
+                View More
+              </span>
+            </button>
+          </div>
+        )}
+      </section>
+    </div>
+  </div>
+</section>
+
+
+
+        <section className="stories-post-area section__hover-line pt-75 pb-40">
+          <div className="container">
+            <div className="section__title-wrap mb-40">
+              <div className="row align-items-end">
+                <div className="col-sm-6">
+                  <div className="section__title">
+                    <span className="section__sub-title stories_popular">
+                      Stories
+                    </span>
+                    <h3 className="section__main-title popular_stories">
+                      Popular Stories
+                    </h3>
+                  </div>
+                </div>
+                <div className="col-sm-6">
+                  <div className="section__read-more text-start text-sm-end">
+                    <Link href="/blog" className="stories_more">
+                      More Post <i className="far fa-long-arrow-right" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="row row-gutters-40">
+              {popular.slice(0, 2).map((item, i) => (
+                <div className="col-md-6" key={i}>
+                  <div className="stories-post__item">
+                    <div className="stories-post__thumb tgImage__hover">
+                      <Link href={`/blog/${item.id}`}>
+                        <img src={item.thumbnail} alt="img" />
+                      </Link>
+                    </div>
+                    <div className="stories-post__content video__post-content">
+                      <ul className="tgbanner__content-meta list-wrap">
+                        <li className="category">
+                          <Link href="/blog">{item.subcategories}</Link>
+                        </li>
+                        <li>
+                          <Link href="/blog">{item.writername}</Link>
+                        </li>
+                        <li>{item.timez}</li>
+                      </ul>
+                      <h3 className="title tgcommon__hover w-97">
+                        <Link href={`/blog/${item.id}`}>{item.heading}</Link>
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="row">
+              {popular.slice(2, 14)?.map((item, i) => (
+                <div className="col-xl-3 col-lg-4 col-md-6" key={i}>
+                  <div className="trending__post stories-small-post__item">
+                    <div className="trending__post-thumb tgImage__hover">
+                      <Link href={`/blog/${item.id}`}>
+                        <img src={item.thumbnail} alt="img" />
+                      </Link>
+                    </div>
+                    <div className="trending__post-content">
+                      <ul className="tgbanner__content-meta list-wrap">
+                        <li className="category">
+                          <Link
+                            href={`/business?hello=${encodeURIComponent(
+                              item.subcategories
+                            )}`}
+                          >
+                            {item.subcategories}
+                          </Link>
+                        </li>
+                      </ul>
+
+                      <ul className="tgbanner__content-meta list-wrap">
+                        <li className="text-black">
+                          <Link href={`/blog/${item.id}`}>
+                            By {item.writername}
+                          </Link>
+                        </li>
+                      </ul>
+                      <h4 className="title tgcommon__hover">
+                        <Link href={`/blog/${item.id}`}>{item.heading}</Link>
+                      </h4>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <button className="btn" onClick={(e) => handleviewmore(e)}>
+                  {currentpopular == lastpopular ? (
+                    <span className="text">Less</span>
+                  ) : (
+                    <span className="text">View More</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section></section>
+        {/* <section className="newsletter-area pb-80">
+          <div className="container">
+            <div className="newsletter__wrap">
+              <div className="row align-items-center">
+                <div className="col-xl-5 col-lg-6">
+                  <div className="newsletter__title">
+                    <span className="sub-title">newsletter</span>
+                    <h4 className="title">
+                      Get notified of the best deals on our WordPress Themes
+                    </h4>
+                  </div>
+                </div>
+                <div className="col-xl-7 col-lg-6">
+                  <div className="newsletter__form-wrap">
+                    <form action="#" className="newsletter__form">
+                      <div className="newsletter__form-grp">
+                        <input
+                          type="email"
+                          placeholder="Email address"
+                          required
+                        />
+                        <div className="form-check">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="flexCheckDefault"
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="flexCheckDefault"
+                          >
+                            I agree that my submitted data is being collected
+                            and stored.
+                          </label>
+                        </div>
+                      </div>
+                      <button className="btn" type="submit">
+                        <span className="text">Subscribe</span>{" "}
+                        <i className="fas fa-paper-plane" />
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section> */}
+      </Layout>
+      <Popup  is_close={is_close}  Setis_close={Setis_close} />
+    </>
   );
 }

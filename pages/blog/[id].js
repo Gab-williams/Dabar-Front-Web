@@ -170,20 +170,20 @@ export default function BlogDetails() {
   useEffect(()=>{
     const changlang = async (selectedx, word) => {
       if(selectedx != '' && word != ""){
-      // const options = {
-      //     method: 'POST',
-      //     url: 'https://deepl-translator2.p.rapidapi.com/translate',
-      //     headers: {
-      //         'content-type': 'application/json',
-      //         'X-RapidAPI-Key': '7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0',
-      //         'X-RapidAPI-Host': 'deepl-translator2.p.rapidapi.com'
-      //     },
-      //     data: {
-      //         source_lang: 'EN',
-      //         target_lang: selectedx,
-      //         text: word
-      //     }
-      // };
+      const options = {
+          method: 'POST',
+          url: 'https://deepl-translator2.p.rapidapi.com/translate',
+          headers: {
+              'content-type': 'application/json',
+              'X-RapidAPI-Key': '7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0',
+              'X-RapidAPI-Host': 'deepl-translator2.p.rapidapi.com'
+          },
+          data: {
+              source_lang: 'EN',
+              target_lang: selectedx,
+              text: word
+          }
+      };
      try {
       let res = await axios.request(options);
       return res?.data

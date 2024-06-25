@@ -108,27 +108,30 @@ export default function TrendingSlider({ showItem, selectedx }) {
          
         if (selectedx === 'GB') {
             setTendall(newData);
-        } else if (selectedx !== 'GB') {
-          console.log("here", selectedx)
-          const translatedData = await Promise.all(newData.map(async (item) => {
-            let heading = await changlang(selectedx, item.heading);
-            let summary = await changlang(selectedx, item.summary);
-            let subcategories = await changlang(selectedx, item.subcategories);
-            let timez = await changlang(selectedx, item.timez);
+        }
+        
+        // else if (selectedx !== 'GB') {
+        //   console.log("here", selectedx)
+        //   const translatedData = await Promise.all(newData.map(async (item) => {
+        //     let heading = await changlang(selectedx, item.heading);
+        //     let summary = await changlang(selectedx, item.summary);
+        //     let subcategories = await changlang(selectedx, item.subcategories);
+        //     let timez = await changlang(selectedx, item.timez);
       
-            return {
-                heading:heading != undefined? heading.data:"",
-                summary: summary  != undefined? summary.data:"",
-                thumbnail: item.thumbnail,
-                subcategories:subcategories != undefined ? subcategories.data:"",
-                id: item.id,
-                writername: item.writername,
-                timez: timez != undefined ? timez.data:""
-            };
-        }));
-        setTendall(translatedData);
+        //     return {
+        //         heading:heading != undefined? heading.data:"",
+        //         summary: summary  != undefined? summary.data:"",
+        //         thumbnail: item.thumbnail,
+        //         subcategories:subcategories != undefined ? subcategories.data:"",
+        //         id: item.id,
+        //         writername: item.writername,
+        //         timez: timez != undefined ? timez.data:""
+        //     };
+        // }));
+        // setTendall(translatedData);
       
-        }else {
+        // }
+        else {
             setTendall(newData);
             }
 

@@ -10,20 +10,20 @@ export default function BlogSidebar(props) {
 
     const changlangx = async (selectedx, word) => {
       if(selectedx != '' && word != ""){
-        // const options = {
-      //     method: 'POST',
-      //     url: 'https://deepl-translator2.p.rapidapi.com/translate',
-      //     headers: {
-      //         'content-type': 'application/json',
-      //         'X-RapidAPI-Key': '7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0',
-      //         'X-RapidAPI-Host': 'deepl-translator2.p.rapidapi.com'
-      //     },
-      //     data: {
-      //         source_lang: 'EN',
-      //         target_lang: selectedx,
-      //         text: word
-      //     }
-      // };
+      const options = {
+          method: 'POST',
+          url: 'https://deepl-translator2.p.rapidapi.com/translate',
+          headers: {
+              'content-type': 'application/json',
+              'X-RapidAPI-Key': '7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0',
+              'X-RapidAPI-Host': 'deepl-translator2.p.rapidapi.com'
+          },
+          data: {
+              source_lang: 'EN',
+              target_lang: selectedx,
+              text: word
+          }
+      };
      try {
       let res = await axios.request(options);
       return res?.data
@@ -225,10 +225,15 @@ export default function BlogSidebar(props) {
         <div className="widget sidebar-widget">
           <SidePostSlider />
         </div>
+        
         <div className="widget sidebar-widget">
-          <h4 className="widget-title text-center">Instagram Feeds</h4>
+          <h4 className="widget-title text-center">Dabar White Paper</h4>
           <div className="sidebarInsta__wrap">
-            <div className="sidebarInsta__top">
+          <InstagramSidebarSlider />
+          {/* <div className="swiper-container sidebarInsta-active">
+              
+              </div> */}
+            {/* <div className="sidebarInsta__top">
               <div className="sidebarInsta__logo">
                 <img src="/assets/img/instagram/insta_logo.png" alt="img" />
               </div>
@@ -238,16 +243,11 @@ export default function BlogSidebar(props) {
                 </h6>
                 <span className="designation">Your lens into ...</span>
               </div>
-            </div>
+            </div> */}
             <div className="sidebarInsta__slider-wrap">
-              <div className="swiper-container sidebarInsta-active">
-                <InstagramSidebarSlider />
-              </div>
-              <div className="swiper-container sidebarInsta-active-2" dir="rtl">
-                <InstagramSidebarSlider />
-              </div>
+             
             </div>
-            <div className="sidebarInsta__bottom">
+            {/* <div className="sidebarInsta__bottom">
               <Link
                 href="https://www.instagram.com/the.dabar/?igshid=YzAwZjE1ZTI0Zg%3D%3D"
                 target="_blank"
@@ -256,7 +256,7 @@ export default function BlogSidebar(props) {
                 <i className="fab fa-instagram" />
                 <span className="text">Follow Me</span>
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </aside>

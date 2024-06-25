@@ -3,8 +3,6 @@ import Link from 'next/link';
 import axios from 'axios';
 // import { context } from "../../components/context";
 import { context } from '../../context';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTiktok } from '@fortawesome/free-brands-svg-icons';
 export default function Footer3({ footerClass, logoWhite }) {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -19,20 +17,20 @@ export default function Footer3({ footerClass, logoWhite }) {
   const {selectedx, setSelectedx} = created
   useEffect(()=>{
     const changlang = async (selectedx, word) => {
-        // const options = {
-      //     method: 'POST',
-      //     url: 'https://deepl-translator2.p.rapidapi.com/translate',
-      //     headers: {
-      //         'content-type': 'application/json',
-      //         'X-RapidAPI-Key': '7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0',
-      //         'X-RapidAPI-Host': 'deepl-translator2.p.rapidapi.com'
-      //     },
-      //     data: {
-      //         source_lang: 'EN',
-      //         target_lang: selectedx,
-      //         text: word
-      //     }
-      // };
+      const options = {
+          method: 'POST',
+          url: 'https://deepl-translator2.p.rapidapi.com/translate',
+          headers: {
+              'content-type': 'application/json',
+              'X-RapidAPI-Key': '7bddd58440msh9a827296af53740p1be7eajsn6674d57991b0',
+              'X-RapidAPI-Host': 'deepl-translator2.p.rapidapi.com'
+          },
+          data: {
+              source_lang: 'EN',
+              target_lang: selectedx,
+              text: word
+          }
+      };
 
       let res = await axios.request(options);
       return res?.data;
@@ -191,14 +189,6 @@ export default function Footer3({ footerClass, logoWhite }) {
                         target="_blank"
                       >
                         <i className="fab fa-twitter" /> Twitter
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="https://www.tiktok.com/@the.dabar"
-                        target="_blank"
-                      >
-                       <FontAwesomeIcon icon={faTiktok} size="sm, m-1" />Tiktok
                       </Link>
                     </li>
                     <li>
