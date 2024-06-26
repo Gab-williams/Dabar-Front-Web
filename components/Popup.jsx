@@ -21,7 +21,7 @@ export default function Popup({ is_close, Setis_close }) {
   }, []);
 
   return (
-    <div className={`popupshow ${is_close ? '' : 'active'}`}>
+    <div className={`popupshow ${is_close ? '' : 'activex'}`}>
       <section className='items_in'>
         <div>
           <span onClick={() => Setis_close(false)} className='x_text'>Close</span>

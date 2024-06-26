@@ -175,9 +175,6 @@ const MobileMenu = ({ handleMobileMenuClose, openClass }) => {
     handleMobileMenuClose()
       }
 
-
- 
-
     return (
         <>
             <div className="tgmobile__menu">

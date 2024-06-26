@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react"
 export default function InstagramSidebarSlider() {
     return (
         <>
-        <Link href="https://tix.africa/discover/dabarevent" legacyBehavior>
+        <Link href="https://drive.google.com/file/u/2/d/1zoejncUtrRAsPIJp40dNrW4whsMzknIw/view" legacyBehavior>
             <a className="swiper-link" target="_blank" rel="noopener noreferrer">
                 <Swiper
                     modules={[Autoplay, Pagination, Navigation]}
