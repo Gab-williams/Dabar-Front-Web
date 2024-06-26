@@ -223,6 +223,7 @@ export default function BlogSidebar(props) {
           </ul>
         </div>
         <div className="widget sidebar-widget">
+        <h4 className="widget-title text-center">Dabar Events</h4>
           <SidePostSlider />
         </div>
         
