@@ -159,6 +159,7 @@ export default function BlogSidebar2({selectedx}) {
                     </ul>
                 </div>
                 <div className="widget sidebar-widget">
+                <h4 className="widget-title text-center">Dabar Events</h4>
                     <SidePostSlider />
                 </div>
                 <div className="widget sidebar-widget">
